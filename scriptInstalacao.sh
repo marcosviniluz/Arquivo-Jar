@@ -1,49 +1,52 @@
 #!/bin/bash
-	
-echo  "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Olá , serei seu assistente para instalação da nossa aplicação!;"
-echo  "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7)  Verificando aqui se você possui o Java instalado...;"
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Olá, serei seu assistente para instalação da nossa aplicação!;"
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Verificando aqui se você possui o Java instalado...;"
 sleep 2
 
 java -version
-if [ $? -eq 0 ]
-	then
-		echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) : Você já tem o java instalado!!!"
-	else
-		echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7)  Opa! Não identifiquei nenhuma versão do Java instalado, mas sem problemas, irei resolver isso agora!"
-		then
-			echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7)  Instalando Java na sua máquina"
-			sleep 2
-			sudo apt install openjdk-17-jre -y
-				then
-					echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Java instalado com sucesso!"
+if [ $? -eq 0 ]; then
+    echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Você já tem o Java instalado!!!"
+else
+    echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Opa! Não identifiquei nenhuma versão do Java instalado, mas sem problemas, irei resolver isso agora!"
+    echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Instalando Java na sua máquina"
+    sleep 2
+    sudo apt update
+    sudo apt install openjdk-17-jre -y
+    echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Java instalado com sucesso!"
 fi
-echo  "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7)  Agora vamos configurar sua máquina para receber nossa aplicação;"
-sudo apt update && sudo apt upgrade –y
-sudo apt install docker.io		
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Agora vamos configurar sua máquina para receber nossa aplicação;"
+sudo apt update && sudo apt upgrade -y
+sudo apt install docker.io -y
 sudo systemctl start docker
 sudo systemctl enable docker
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Configurando o banco de dados MySQL;"
 sudo docker pull mysql:5.7
 sudo docker run -d -p 3306:3306 --name ContainerBD -e "MYSQL_DATABASE=air_totem" -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:5.7
-sudo docker exec -it ContainerBD bash
-mysql -u root -p
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Esperando o banco de dados inicializar..."
+sleep 20
+
+sudo docker exec -i ContainerBD mysql -u root -p
 urubu100
 CREATE DATABASE air_totem;
 
 USE air_totem;
 
 CREATE TABLE empresa (
-	idEmpresa INT PRIMARY KEY AUTO_INCREMENT,
+    idEmpresa INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(45),
     cnpj VARCHAR(45),
     telefone VARCHAR(45)
 );
 
-CREATE TABLE aeroporto(
-	idAero INT PRIMARY KEY auto_increment,
+CREATE TABLE aeroporto (
+    idAero INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(45),
     cep VARCHAR(45)
 );
-
 
 CREATE TABLE terminal (
     idTerminal INT PRIMARY KEY AUTO_INCREMENT,
@@ -53,37 +56,34 @@ CREATE TABLE terminal (
     FOREIGN KEY (fk_aeroporto) REFERENCES aeroporto(idAero)
 );
 
-
 CREATE TABLE usuario (
-	idUser INT PRIMARY KEY AUTO_INCREMENT,
-	nome VARCHAR(50),
+    idUser INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(50),
     sobrenome VARCHAR(50),
-	email VARCHAR(50),
-	senha VARCHAR(50),
+    email VARCHAR(50),
+    senha VARCHAR(50),
     cpf VARCHAR(45),
     telefone VARCHAR(45),
     celular VARCHAR(45),
     cep VARCHAR(45),
-    endereço VARCHAR(45),
+    endereco VARCHAR(45),
     numero VARCHAR(45),
     complemento VARCHAR(45),
-    nivelAcesso ENUM('Administrador', 'Gerente' ,'Suporte'),
-	fk_empresa INT,
-	FOREIGN KEY (fk_empresa) REFERENCES empresa(idEmpresa),
+    nivelAcesso ENUM('Administrador', 'Gerente', 'Suporte'),
+    fk_empresa INT,
+    FOREIGN KEY (fk_empresa) REFERENCES empresa(idEmpresa),
     fk_aeroporto INT,
-	FOREIGN KEY (fk_aeroporto) REFERENCES aeroporto(idAero)
+    FOREIGN KEY (fk_aeroporto) REFERENCES aeroporto(idAero)
 );
 
-
-
 CREATE TABLE totem (
-	idTotem INT PRIMARY KEY AUTO_INCREMENT,
+    idTotem INT PRIMARY KEY AUTO_INCREMENT,
     fk_empresa INT,
-	FOREIGN KEY (fk_empresa) REFERENCES empresa(idEmpresa),
+    FOREIGN KEY (fk_empresa) REFERENCES empresa(idEmpresa),
     fk_aeroporto INT,
-	FOREIGN KEY (fk_aeroporto) REFERENCES aeroporto(idAero),
+    FOREIGN KEY (fk_aeroporto) REFERENCES aeroporto(idAero),
     fk_terminal INT,
-	FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal),
+    FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal),
     dataInstalacao DATE,
     tempo_atv VARCHAR(255),
     modeloProcessador VARCHAR(255),
@@ -96,7 +96,6 @@ CREATE TABLE totem (
     nomeDominioRede VARCHAR(255),
     velocidadeRede DOUBLE
 );
-
 
 CREATE TABLE disco (
     idDisco INT AUTO_INCREMENT,
@@ -120,7 +119,7 @@ CREATE TABLE historico (
     fk_totem INT,
     FOREIGN KEY (fk_totem) REFERENCES totem(idTotem),
     fk_terminal INT,
-	FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal)
+    FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal)
 );
 
 CREATE TABLE metrica (
@@ -137,7 +136,6 @@ CREATE TABLE metrica (
     FOREIGN KEY (fk_empresa) REFERENCES empresa(idEmpresa)
 );
 
-
 CREATE TABLE historicoStatus (
     idhistoricoStatus INT PRIMARY KEY AUTO_INCREMENT,
     diaHorario VARCHAR(45),
@@ -146,7 +144,7 @@ CREATE TABLE historicoStatus (
     fk_totem INT,
     FOREIGN KEY (fk_totem) REFERENCES totem(idTotem),
     fk_terminal INT,
-	FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal),
+    FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal),
     statusTotem ENUM ('Manutenção', 'Ativo', 'Inativo')
 );
 
@@ -160,9 +158,8 @@ CREATE TABLE historicoDisco (
     fk_totem INT,
     FOREIGN KEY (fk_totem) REFERENCES totem(idTotem),
     fk_terminal INT,
-	FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal)
+    FOREIGN KEY (fk_terminal) REFERENCES terminal(idTerminal)
 );
-
 
 CREATE TABLE faleConosco (
     idContato INT PRIMARY KEY AUTO_INCREMENT,
@@ -172,28 +169,16 @@ CREATE TABLE faleConosco (
 );
 
 INSERT INTO empresa (nome, cnpj, telefone) VALUES
-('Empresa', '12345678901234', '(11) 1234-5678'),
-('Empresa', '98765432109876', '(21) 9876-5432');
+('Empresa 1', '12345678901234', '(11) 1234-5678'),
+('Empresa 2', '98765432109876', '(21) 9876-5432');
 
 INSERT INTO aeroporto (nome, cep) VALUES
 ('Aeroporto Internacional A', '12345-678'),
 ('Aeroporto Nacional B', '54321-876');
 
-
-INSERT INTO usuario (nome, email, senha, cpf, nivelAcesso, fk_empresa, fk_aeroporto) VALUES
-('Usuário 1', 'usuario1@email.com', 'senha123', '123.456.789-00', 'Administrador', 1, 1),
-('Usuário 2', 'usuario3@email.com', 'senha456', '987.654.321-00', 'Suporte', 2, 1);
-
-
-INSERT INTO usuario (nome, email, senha, cpf, nivelAcesso, fk_empresa, fk_aeroporto) VALUES
-('Lucas', 'usuario5@email.com', 'senha456', '123.456.789-00', 'Gerente', 1, 1);
-
-
-INSERT INTO usuario (nome, email, senha, cpf, nivelAcesso, fk_empresa, fk_aeroporto) VALUES
-('Usuário 1', 'usuario1@email.com', 'senha456', '123.456.789-00', 'Administrador', 2, 1);
-
-INSERT INTO usuario (nome, email, senha, cpf, nivelAcesso, fk_empresa, fk_aeroporto) VALUES
-('Usuário 1', 'usuario1@email.com', 'senha456', '123.456.789-00', 'Administrador', 2, 1);
+INSERT INTO usuario (nome, sobrenome, email, senha, cpf, telefone, celular, cep, endereco, numero, complemento, nivelAcesso, fk_empresa, fk_aeroporto) VALUES
+('Usuário 1', 'Silva', 'usuario1@email.com', 'senha123', '123.456.789-00', '(11) 1111-1111', '(11) 9999-9999', '12345-678', 'Rua A', '100', 'Apto 1', 'Administrador', 1, 1),
+('Usuário 2', 'Souza', 'usuario2@email.com', 'senha456', '987.654.321-00', '(21) 2222-2222', '(21) 8888-8888', '54321-876', 'Rua B', '200', 'Apto 2', 'Suporte', 2, 2);
 
 INSERT INTO metrica (
     metricaProcessadorRangeAlerta, 
@@ -207,5 +192,6 @@ INSERT INTO metrica (
     fk_empresa
 ) VALUES
 (4, 1, 1, 1, 1, 1, 1, 1, 1);
+EOF
 
-
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Instalação e configuração concluídas com sucesso!"
