@@ -26,10 +26,9 @@ echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Configurando o banc
 sudo docker pull mysql:5.7
 sudo docker run -d -p 3306:3306 --name ContainerBD -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:5.7
 
-echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Esperando o banco de dados inicializar..."
-sleep 20
-
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Inicializando o banco de dados"
+sleep 7
 sudo docker cp script.sql ContainerBD:/script.sql
 sudo docker exec -i ContainerBD mysql -u root -purubu100 < /script.sql
 
-echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Banco de dados configurado, agora iniacialize a nossa aplicação
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Banco de dados configurado, agora inicialize a nossa aplicação"
