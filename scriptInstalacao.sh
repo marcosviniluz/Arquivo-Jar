@@ -1,5 +1,8 @@
 #!/bin/bash
 
+chmod 755 $0
+chmod 644 script.sql
+
 echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Olá, serei seu assistente para instalação da nossa aplicação!;"
 echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Verificando aqui se você possui o Java instalado...;"
 sleep 2
