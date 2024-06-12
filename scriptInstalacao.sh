@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/bash#!/bin/bash
 
+# Garantir permissões corretas
 chmod 755 $0
 chmod 644 script.sql
 
@@ -29,9 +30,20 @@ echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Configurando o banc
 sudo docker pull mysql:5.7
 sudo docker run -d -p 3306:3306 --name ContainerBD -e "MYSQL_ROOT_PASSWORD=urubu100" mysql:5.7
 
-echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Inicializando o banco de dados"
-sleep 7
-sudo docker cp script.sql ContainerBD:/script.sql
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Esperando o banco de dados inicializar..."
+sleep 20
+
+# Use o caminho absoluto para o arquivo script.sql
+SCRIPT_PATH=$(pwd)/script.sql
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Copiando script.sql para o container..."
+sudo docker cp $SCRIPT_PATH ContainerBD:/tmp/script.sql
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Executando script.sql no banco de dados..."
+sudo docker exec -i ContainerBD mysql -u root -purubu100 -e "source /tmp/script.sql"
+
+echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Banco de dados configurado, agora inicialize a nossa aplicação"
+ql
 sudo docker exec -i ContainerBD mysql -u root -purubu100 < /script.sql
 
 echo "$(tput setaf 10)[Air Totem assistente]:$(tput setaf 7) Banco de dados configurado, agora inicialize a nossa aplicação"
